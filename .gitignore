@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/CheckIfModifiedAfterPublishTest/bin/Debug
+/CheckIfModifiedAfterPublishTest/obj/Debug
+/HelloWorld
+/ModifiedAfterLastPublish/bin/Debug
+/ModifiedAfterLastPublish/obj/Debug
+/packages
+/TridionLibraries
+*.suo
+*.user
