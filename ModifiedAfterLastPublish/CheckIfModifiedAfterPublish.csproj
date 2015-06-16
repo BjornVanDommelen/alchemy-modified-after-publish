@@ -83,6 +83,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="a4t.xml" />
     <Content Include="Static\Scripts\Check.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

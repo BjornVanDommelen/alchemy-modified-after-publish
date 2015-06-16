@@ -7,7 +7,7 @@ using System.ServiceModel.Channels;
 namespace CheckIfModifiedAfterPublishTest
 {
     [TestClass]
-    public class UnitTest1
+    public class CoreServiceOperationsTest
     {
         public Binding CreateBinding(int maxSize, bool isHttps)
         {
@@ -71,7 +71,7 @@ namespace CheckIfModifiedAfterPublishTest
 
         private CheckIfModifiedAfterPublish.ModifiedAfterPublishReportGenerator generator;
 
-        public UnitTest1()
+        public CoreServiceOperationsTest()
         {
             ISessionAwareCoreService client = this.GetCoreServiceClient();
             this.generator = new CheckIfModifiedAfterPublish.ModifiedAfterPublishReportGenerator(client);
