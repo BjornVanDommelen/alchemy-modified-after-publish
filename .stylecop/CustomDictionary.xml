@@ -1,0 +1,34 @@
+<Dictionary>
+  <Words>
+    <!-- Unrecognized>
+      <Word></Word>
+    </Unrecognized -->
+
+    <Recognized>
+      <Word>tridion</Word>
+      <Word>tcm</Word>
+      <Word>wshttp</Word>
+      <Word>api</Word>
+    </Recognized>
+
+    <!-- Deprecated>
+      <Term PreferredAlternate=""></Term>
+    </Deprecated -->
+
+    <!-- Compound>
+      <Term CompoundAlternate=""></Term>
+    </Compound -->
+
+    <!-- DiscreteExceptions>
+      <Term></Term>
+    </DiscreteExceptions -->
+  </Words>
+
+  <Acronyms>
+    <CasingExceptions>
+      <Acronym>API</Acronym>
+      <Acronym>DI</Acronym>
+      <Acronym>GUID</Acronym>
+    </CasingExceptions>
+  </Acronyms>
+</Dictionary>
