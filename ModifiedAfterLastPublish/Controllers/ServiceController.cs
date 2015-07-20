@@ -1,15 +1,28 @@
-using Alchemy4Tridion.Plugins;
-using System;
-using System.Web;
-using System.Web.Http;
-using Tridion.ContentManager.CoreService.Client;
-
-namespace CheckIfModifiedAfterPublish.Controllers
+//-----------------------------------------------------------------------
+// <copyright file="ServiceController.cs" company="Tahzoo">
+//     Copyright (c) Tahzoo. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace Tahzoo.Tridion.Extensions.CheckIfModifiedAfterPublish.Controllers
 {
+    using System;
+    using System.Web.Http;
+    using Alchemy4Tridion.Plugins;
+    using global::Tridion.ContentManager.CoreService.Client;
+
+    /// <summary>
+    /// Web API controller for the extension. This captures requests made by the client on the server
+    ///   and routes them to the appropriate handler.
+    /// </summary>
     [AlchemyRoutePrefix(typeof(AlchemyPlugin), "Service")]
     public class ServiceController : AlchemyApiController
     {
-        // GET /Alchemy/Plugins/CheckIfModifiedAfterPublish/api/Service/GetReport/tcmUri
+        /// <summary>
+        /// Gets the modified-after-last-publish report on the given Tridion item.
+        /// URL: GET /Alchemy/Plugins/CheckIfModifiedAfterPublish/api/Service/GetReport/tcmUri
+        /// </summary>
+        /// <param name="encodedUri">TCMURI of the tridion item in some encoded form</param>
+        /// <returns>20X status code with JSON object containing report data or 400 result with error message</returns>
         [HttpGet]
         [Route("GetReport/{encodedUri}")]
         public IHttpActionResult GetReport(string encodedUri)
@@ -24,11 +37,11 @@ namespace CheckIfModifiedAfterPublish.Controllers
             {
                 SessionAwareCoreServiceClient client = new SessionAwareCoreServiceClient("netTcp_2013");
                 client.Impersonate("AZEROTH\\administrator");
-                var reportGenerator = new ModifiedAfterPublishReportGenerator(client);
+                var reportGenerator = new TridionItemProcessor(client);
                 DateTime lastModificationDate = reportGenerator.GetLastModificationDate(tcmUri);
                 DateTime lastPublishDate = reportGenerator.GetLastPublishDate(tcmUri);
                 bool isModified = lastModificationDate > lastPublishDate;
-                string report = "";
+                string report = string.Empty;
                 if (isModified)
                 {
                     report = string.Format(
@@ -45,13 +58,14 @@ namespace CheckIfModifiedAfterPublish.Controllers
                         lastPublishDate,
                         lastModificationDate);
                 }
+
                 client.Close();
 
-                return Ok(report);
+                return this.Ok(report);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return this.BadRequest(ex.Message);
             }
         }
     }

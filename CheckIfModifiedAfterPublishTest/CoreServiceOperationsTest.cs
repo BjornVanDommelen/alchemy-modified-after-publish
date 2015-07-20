@@ -1,124 +1,105 @@
-﻿using System;
-using System.ServiceModel;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Tridion.ContentManager.CoreService.Client;
-using System.ServiceModel.Channels;
-
-namespace CheckIfModifiedAfterPublishTest
+﻿//-----------------------------------------------------------------------
+// <copyright file="CoreServiceOperationsTest.cs" company="Tahzoo">
+//     Copyright (c) Tahzoo. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+namespace Tahzoo.Tridion.Extensions.CheckIfModifiedAfterPublishTest
 {
+    using System;
+    using System.ServiceModel;
+    using System.ServiceModel.Channels;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using global::Tridion.ContentManager.CoreService.Client;
+
+    /// <summary>
+    /// Tests for the core service client.
+    /// These represent the tests for the actual business logic of the plugin
+    ///   which is all executed server side.
+    /// </summary>
     [TestClass]
     public class CoreServiceOperationsTest
     {
-        public Binding CreateBinding(int maxSize, bool isHttps)
-        {
-            return new WSHttpBinding()
-            {
-                MaxBufferPoolSize = maxSize,
-                MaxReceivedMessageSize = maxSize,
-                ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas()
-                {
-                    MaxStringContentLength = maxSize,
-                    MaxArrayLength = maxSize,
-                },
-                Security = new WSHttpSecurity()
-                {
-                    Mode = isHttps ? SecurityMode.TransportWithMessageCredential : SecurityMode.Message,
-                    Message = new NonDualMessageSecurityOverHttp()
-                    {
-                        ClientCredentialType = MessageCredentialType.Windows
-                    }
-                }
-            };
-        }
+        /// <summary>
+        /// Host name to connect to.
+        /// </summary>
+        private const string SERVICEHOST = "http://azeroth.local:81/";
 
         /// <summary>
-        /// Generates the endpoint address string from the given "unclean" hostname and "clean" service and binding path
+        /// User name to connect with.
         /// </summary>
-        /// <param name="hostname">Hostname with or without protocol and trailing slash</param>
-        /// <param name="serviceAndBindingPath">Path to service without leading slash</param>
-        /// <returns>Fully qualified URL of service endpoint</returns>
-        private static string GetEndpointAddress(string hostname, string serviceAndBindingPath)
-        {
-            return String.Format("{0}{1}{2}{3}",
-                hostname.StartsWith("http") ? "" : "http://",
-                hostname,
-                hostname.EndsWith("/") ? "" : "/",
-                serviceAndBindingPath
-            );
-        }
+        private const string SERVICEUSER = "AZEROTH\\Administrator";
 
         /// <summary>
-        /// Creates an EndpointAddress object from the given "unclean" hostname and "clean" service and binding path
+        /// Password to connect with.
         /// </summary>
-        /// <param name="hostname">Hostname with or without protocol and trailing slash</param>
-        /// <param name="serviceAndBindingPath">Path to service without leading slash</param>
-        /// <returns>EndpointAddress object for the service endpoint</returns>
-        public static EndpointAddress CreateEndpoint(string hostname, string serviceAndBindingPath)
-        {
-            return new EndpointAddress(GetEndpointAddress(hostname, serviceAndBindingPath));
-        }
+        private const string SERVICEPSWD = "Tridion2013SP1";
 
-        private const string SERVICE_HOST = "http://azeroth.local:81/";
+        /// <summary>
+        /// Object to test.
+        /// </summary>
+        private CheckIfModifiedAfterPublish.TridionItemProcessor generator;
 
-        private ISessionAwareCoreService GetCoreServiceClient()
-        {
-            var x = new SessionAwareCoreServiceClient(CreateBinding(2 * 1024 * 1024, false), CreateEndpoint(SERVICE_HOST, "webservices/CoreService2013.svc/wsHttp"));
-            x.ClientCredentials.Windows.AllowedImpersonationLevel = System.Security.Principal.TokenImpersonationLevel.Delegation;
-            x.ClientCredentials.Windows.ClientCredential = new System.Net.NetworkCredential("AZEROTH\\Administrator", "Tridion2013SP1");
-
-            return x;
-        }
-
-        private CheckIfModifiedAfterPublish.ModifiedAfterPublishReportGenerator generator;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CoreServiceOperationsTest"/> class.
+        /// Initializes the core service client and report generator.
+        /// </summary>
         public CoreServiceOperationsTest()
         {
-            ISessionAwareCoreService client = this.GetCoreServiceClient();
-            this.generator = new CheckIfModifiedAfterPublish.ModifiedAfterPublishReportGenerator(client);
+            ISessionAwareCoreService client = CoreServiceClientFactory.CreateClient(SERVICEHOST, SERVICEUSER, SERVICEPSWD);
+            this.generator = new CheckIfModifiedAfterPublish.TridionItemProcessor(client);
         }
 
-        [TestMethod]
-        public void TestApiVersion()
-        {
-            string apiVersion = generator.GetApiVersion();
-            Assert.AreEqual("7.1.0", apiVersion);
-        }
-
+        /// <summary>
+        /// Tests if the generator correctly asserts a last-modified date to be greater than
+        ///   a known date in the past.
+        /// </summary>
         [TestMethod]
         public void IsModifiedAfter2002()
         {
             DateTime when = DateTime.Parse("2002/01/01");
             string itemUri = "tcm:6-59-64";
 
-            bool testData = generator.IsModifiedAfter(itemUri, when);
+            bool testData = this.generator.IsModifiedAfter(itemUri, when);
 
             Assert.AreEqual(true, testData);
         }
 
+        /// <summary>
+        /// Tests if the generator correctly asserts a last modified date to be smaller than
+        ///   a known date in the future.
+        /// </summary>
         [TestMethod]
         public void IsModifiedAfter2020()
         {
             DateTime when = DateTime.Parse("2020/01/01");
             string itemUri = "tcm:6-59-64";
 
-            bool testData = generator.IsModifiedAfter(itemUri, when);
+            bool testData = this.generator.IsModifiedAfter(itemUri, when);
 
             Assert.AreEqual(false, testData);
         }
 
+        /// <summary>
+        /// Tests if the generator can determine the last publish date of a page.
+        /// </summary>
         [TestMethod]
         public void GetLastPublishDate()
         {
             string itemUri = "tcm:6-59-64";
-            DateTime testData = generator.GetLastPublishDate(itemUri);
+            DateTime testData = this.generator.GetLastPublishDate(itemUri);
             Assert.AreNotEqual(DateTime.Now, testData);
         }
 
+        /// <summary>
+        /// Tests is the generator can correctly assess if the last publish date
+        ///   of a page is older than the last modification date of all items in the
+        ///   dependency graph.
+        /// </summary>
         [TestMethod]
         public void IsModifiedAfterPublish()
         {
             string itemUri = "tcm:6-59-64";
-            bool testData = generator.IsModifiedAfterPublish(itemUri);
+            bool testData = this.generator.IsModifiedAfterPublish(itemUri);
             Assert.AreEqual(false, testData);            
         }
     }
