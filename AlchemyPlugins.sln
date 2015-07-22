@@ -17,6 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckIfModifiedAfterPublish
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B60D3165-4BB1-4AEC-ADA4-9921B1E16CAC}"
 	ProjectSection(SolutionItems) = preProject
+		.stylecop\CustomDictionary.xml = .stylecop\CustomDictionary.xml
 		README.md = README.md
 	EndProjectSection
 EndProject

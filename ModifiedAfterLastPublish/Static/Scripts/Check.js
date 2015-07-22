@@ -12,9 +12,14 @@ Alchemy.Plugins.CheckIfModifiedAfterPublish.Commands.Check = function () {
  * Whether or not the command is available.
  */
 Alchemy.Plugins.CheckIfModifiedAfterPublish.Commands.Check.prototype.isAvailable = function (selection) {
-    var item = $models.getItem(selection.getItem(0));
-    var itemType = item.getItemType();
-    return itemType == "tcm:64";
+    if (selection.getItems().length == 1) {
+        var item = $models.getItem(selection.getItem(0));
+        var itemType = item.getItemType();
+        return itemType == "tcm:64";
+    }
+    else {
+        return false;
+    }
 };
 
 /**
@@ -33,18 +38,17 @@ Alchemy.Plugins.CheckIfModifiedAfterPublish.Commands.Check.prototype._execute = 
     var itemId = item.getId();
     var encodedItemId = itemId.replace("tcm:", "");
     var progress = $messages.registerProgress("Checking if [" + item.getId() + "] is modified after the last time it was published...", null);
-    var Service = Alchemy.Plugins.CheckIfModifiedAfterPublish.Api.Service.getReport(encodedItemId)
+    var Service = Alchemy.Plugins.ModifiedAfterPublish.Api.Service.getReport(encodedItemId)
         .success(function (report) {
-            var ok = report.split("|")[0] == "OK";
-            if (ok) {
-                $messages.registerGoal(report.split("|")[1]);
+            if (!report.IsModifiedAfterPublish) {
+                $messages.registerGoal(report.ReportText);
             }
             else {
-                $messages.registerWarning(report.split("|")[1]);
+                $messages.registerWarning(report.ReportText);
             }
         })
         .error(function (type, error) {
-            $messages.registerError("FAIL! ARGH!");
+            $messages.registerError(error);
         })
         .complete(function () {
             progress.finish();

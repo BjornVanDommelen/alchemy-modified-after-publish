@@ -33,7 +33,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Unittest|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Unittest\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;AlchemyRemoveBuildFiles</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;AlchemyRemoveBuildFiles_None</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -86,9 +86,12 @@
     <Compile Include="Configs\DefaultExtension.cs" />
     <Compile Include="Configs\DefaultResourceGroup.cs" />
     <Compile Include="Configs\CheckCommandSet.cs" />
+    <Compile Include="ImpersonationException.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
     <Compile Include="ExtensionException.cs" />
     <Compile Include="ItemNotFoundException.cs" />
+    <Compile Include="ModifiedAfterPublishReport.cs" />
+    <Compile Include="ReportGenerator.cs" />
     <Compile Include="TridionItemProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

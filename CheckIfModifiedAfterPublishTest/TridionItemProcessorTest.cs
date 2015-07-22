@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="CoreServiceOperationsTest.cs" company="Tahzoo">
+// <copyright file="TridionItemProcessorTest.cs" company="Tahzoo">
 //     Copyright (c) Tahzoo. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
@@ -17,7 +17,7 @@ namespace Tahzoo.Tridion.Extensions.CheckIfModifiedAfterPublishTest
     ///   which is all executed server side.
     /// </summary>
     [TestClass]
-    public class CoreServiceOperationsTest
+    public class TridionItemProcessorTest
     {
         /// <summary>
         /// Host name to connect to.
@@ -40,10 +40,10 @@ namespace Tahzoo.Tridion.Extensions.CheckIfModifiedAfterPublishTest
         private CheckIfModifiedAfterPublish.TridionItemProcessor generator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CoreServiceOperationsTest"/> class.
+        /// Initializes a new instance of the <see cref="TridionItemProcessorTest"/> class.
         /// Initializes the core service client and report generator.
         /// </summary>
-        public CoreServiceOperationsTest()
+        public TridionItemProcessorTest()
         {
             ISessionAwareCoreService client = CoreServiceClientFactory.CreateClient(SERVICEHOST, SERVICEUSER, SERVICEPSWD);
             this.generator = new CheckIfModifiedAfterPublish.TridionItemProcessor(client);
